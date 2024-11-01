@@ -1,19 +1,26 @@
+import os
 import dotenv
+
+from fastapi import Depends
+from sqlmodel import SQLModel, create_engine, Session
+from typing import Annotated
+
 
 dotenv.load_dotenv()
 
-import uuid
-import os
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+engine = create_engine(DATABASE_URL, echo=True)
 
 
-from sqlmodel import SQLModel, create_engine, Field
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
 
 
-class Products(SQLModel, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str
-    image: str
+def get_session():
+    with Session(engine) as session:
+        yield session
 
-DATABSE_URI = os.getenv('DATABASE_URI')
 
-engine = create_engine(DATABSE_URI)
+SessionDep = Annotated[Session, Depends(get_session)]
