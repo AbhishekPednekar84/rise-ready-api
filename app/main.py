@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from .database.db import create_db_and_tables
-from .routers import products
+from .routers import products, orders, order_window
 
 
 app = FastAPI()
@@ -11,9 +11,6 @@ def on_startup():
     create_db_and_tables()
 
 
-@app.get("/")
-async def read_root():
-    return {"hello World"}
-
-
 app.include_router(products.router)
+app.include_router(orders.router)
+app.include_router(order_window.router)
